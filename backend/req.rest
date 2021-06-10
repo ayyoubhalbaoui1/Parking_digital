@@ -1,0 +1,11 @@
+GET http://localhost:3000/api/students/all
+###
+POST http://localhost:4000/api/students/add
+Content-Type: application/json
+
+{
+    "id_student" : "A1Z2E3R4",
+    "full_name" : "naoufal",
+    "phone" : "0614675855",
+    "cin" : "N407789"
+}
