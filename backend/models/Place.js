@@ -1,9 +1,10 @@
 module.exports = (sequelize,DataTypes) => {
 
     const Place = sequelize.define('Place',{
-
-
         
+        stat: {
+            type : DataTypes.BOOLEAN,
+        },
 
     });
 

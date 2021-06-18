@@ -1,7 +1,5 @@
 const { Student } = require('../models')
 const { QueryTypes,Sequelize } = require('sequelize');
-const Op = Sequelize.Op;
-const db = require('../models')
 
 const getStudent = async (req, res) => {
     const id = req.params.id
@@ -15,13 +13,42 @@ res.status(201).json(data)
     }
 }
 
+const getAll = async (req, res) => {
+    try {
+        const students = await Student.findAll()
+        res.json(students)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// find by fullname & cin : 
+const getStudentByCin = async (req, res) => {
+    try {
+        const student = await Student.findOne({
+            where : {
+                fullname : req.body.fullname,
+                cin : req.body.cin
+            }
+        })
+        if(student) {
+            res.json(student)
+        } else {
+            res.json({message : "Student Not Found !!!"})
+        }
+    } catch (error) {
+        res.json(error)
+    }
+}
+
 const addStudent = async (req, res) => {
     try {
         const student = await Student.create({
             id_student : req.body.id_student,
-            fullname : req.body.full_name,
+            fullname : req.body.fullname,
             phone : req.body.phone,
-            cin : req.body.cin
+            cin : req.body.cin,
+            is_valid : req.body.is_valid
         })
         res.json(student)
     } catch (err) {
@@ -29,7 +56,38 @@ const addStudent = async (req, res) => {
     }
 }
 
+const editStudent = async (req, res) => {
+    try {
+        if(!req.body){
+            return res.send({message : "they is not data !!!"})
+        }
+        const idStudent = req.params.id
+        const st = await Student.update(req.body, {
+            where: { id: idStudent }
+        })
+        if(st) {
+            const updatedPost = await Student.findOne({ where: { id: idStudent } });
+            return res.status(200).json({ is_valid : updatedPost });
+        }
+    } catch (error) {
+        res.json(error)
+    }
+}
+
+const deleteStudent = async (req, res) => {
+    var id = req.params.id
+    await Student.destroy({
+        where : {id : req.params.id}
+    }).then(() => {
+        res.json({msg : "Deleted"})
+    })
+}
+
 module.exports = {
     getStudent,
-    addStudent
+    addStudent,
+    getAll,
+    deleteStudent,
+    editStudent,
+    getStudentByCin
 }

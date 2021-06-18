@@ -17,9 +17,11 @@
   },
   "homepage": "https://github.com/ayyoubhalbaoui1/Le-Parking-digital#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "knex": "^0.95.6",
     "mysql2": "^2.2.5",
+    "nodemailer": "^6.6.1",
     "pg": "^8.6.0",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.6.2"
