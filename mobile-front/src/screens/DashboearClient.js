@@ -13,7 +13,7 @@ import email from 'react-native-email'
 export default function DashboardClient ({ navigation }) {
 1234
         // init ip address : 
-        const ip = "http://192.168.11.151:8080";
+        const ip = "http://192.168.1.178:8080";
         const [data, setData] = useState([])
         const [info, setInfo] = useState("")
         //const cin = navigation.getParam('cin');
@@ -21,6 +21,7 @@ export default function DashboardClient ({ navigation }) {
         // get reserved Data :
         const [reserved, setReserved] = useState([])
 
+        // render reserved data if exist
         const getReservedData = () => {
           fetch(`${ip}/api/vih/all`).then(res => {
             return res.json()
@@ -29,11 +30,13 @@ export default function DashboardClient ({ navigation }) {
           })
         }
 
+        // render Client data
         const renderClientData = async () => {
           const data =  await AsyncStorage.getItem('info')
           setInfo(data)
         }
     
+        // render availables places
         const placesData = () => {
           fetch(`${ip}/api/place/getPlace`).then(res => {
             return res.json()
@@ -41,41 +44,117 @@ export default function DashboardClient ({ navigation }) {
             setData(data)
           })
         }
-       
-        const takePlace = (id) => {
-          //console.log(selectedValue, id, info)
-          fetch(`${ip}/api/vih/addVih`, {
-            method : 'POST',
+
+        // unleash a place in parking
+        const lessPlace = (id, PlaceId) => {
+          //console.log(id, PlaceId)
+          fetch(`${ip}/api/vih/delete/${id}`, {
+            method : 'DELETE'
+          }).then(res => {
+            return res.json()
+          })
+          fetch(`${ip}/api/place/edit/${PlaceId}`, {
+            method : 'PATCH',
             headers : {
               'Content-Type' : 'application/json'
             },
             body : JSON.stringify({
-              name : info,
-              type : selectedValue,
-              placeId : id
+              stat : false
             })
-          }).then(res => {
-            return res.json()
-          }).then(data => {
-            if(data) {
-              const to = ['ayyoubhalbaoui2@gmail.com'] //  **Admin email** string or array of email addresses
-              email(to, {
-                  subject: 'Student Informations :',
-                  body: `ID Student : ${info}, Type Vihecule : ${selectedValue}, ID Place : ${id}`
-              }).catch(console.error)
-              alert("Success")
-              navigation.navigate('LoginScreenClient')
-            } else {
-              alert("Error !!!")
-            }
           })
+          const to = ['ayyoubhalbaoui2@gmail.com'] // string or array of email addresses
+          email(to, {
+            subject: 'Unleash a Place :',
+            body: `ID of Place Unleashed is : ${PlaceId}`
+          }).catch(console.error)
+          alert("Success")
+          navigation.navigate('LoginScreenClient')
         }
-console.log(reserved)
+       
+        // taek a place in parking
+        const takePlace = (id) => {
+          //console.log(selectedValue, id, info)
+          if(selectedValue == 'Bike'){
+            fetch(`${ip}/api/vih/addVih`, {
+              method : 'POST',
+              headers : {
+                'Content-Type' : 'application/json'
+              },
+              body : JSON.stringify({
+                name : info,
+                type : selectedValue,
+                placeId : id
+              })
+            }).then(res => {
+              return res.json()
+            }).then(data => {
+              if(data) {
+                fetch(`${ip}/api/place/edit/${id}`, {
+                  method : 'PATCH',
+                  headers : {
+                    'Content-Type' : 'application/json'
+                  },
+                  body : JSON.stringify({
+                    stat : true
+                  })
+                }).then(res => {
+                  return res.json()
+                })
+                const to = ['ayyoubhalbaoui2@gmail.com'] // string or array of email addresses
+                email(to, {
+                    subject: 'Take a Place :',
+                    body: `ID Student : ${info}, Type Vihecule : ${selectedValue}, ID Place : ${id}, Price : 3dh`
+                }).catch(console.error)
+                alert("Success")
+                navigation.navigate('LoginScreenClient')
+              } else {
+                alert("Error !!!")
+              }
+            })
+          } else {
+            fetch(`${ip}/api/vih/addVih`, {
+              method : 'POST',
+              headers : {
+                'Content-Type' : 'application/json'
+              },
+              body : JSON.stringify({
+                name : info,
+                type : selectedValue,
+                placeId : id
+              })
+            }).then(res => {
+              return res.json()
+            }).then(data => {
+              if(data) {
+                fetch(`${ip}/api/place/edit/${id}`, {
+                  method : 'PATCH',
+                  headers : {
+                    'Content-Type' : 'application/json'
+                  },
+                  body : JSON.stringify({
+                    stat : true
+                  })
+                }).then(res => {
+                  return res.json()
+                })
+                const to = ['ayyoubhalbaoui2@gmail.com'] // string or array of email addresses
+                email(to, {
+                    subject: 'Student Informations :',
+                    body: `ID Student : ${info}, Type Vihecule : ${selectedValue}, ID Place : ${id}, Price : 5dh`
+                }).catch(console.error)
+                alert("Success")
+                navigation.navigate('LoginScreenClient')
+              } else {
+                alert("Error !!!")
+              }
+            })
+          }
+        }
+        //console.log(reserved)
         useEffect(() => {
-            placesData()
-            renderClientData()
-            getReservedData()
-            
+          placesData()
+          renderClientData()
+          getReservedData()
         }, [])
 
     return (
@@ -96,11 +175,29 @@ console.log(reserved)
                 >
                   <Picker.Item label="Bike" value="Bike" />
                   <Picker.Item label="Car" value="Car" />
-                  <Picker.Item label="Bus" value="Bus" />
                 </Picker>
-                {data.map((i) => (
-                    i.stat == false ?
+                </View>
+                <View>
+                  {reserved != "" ? 
+                    reserved.map(i => (
+                    i.name == info ?
                     <View key={i.id}>
+                      <Text>{i.id}</Text>
+                      <Button 
+                      mode="contained"
+                      style={styles.btn}
+                      onPress={() => lessPlace(i.id, i.PlaceId)}
+                      >
+                        {i.PlaceId}
+                      </Button>
+                      </View>
+                      :
+                      false
+                      ))
+                  :
+                  data.map((i) => (
+                    i.stat == false ?
+                    <View key={i.id} >
                     <Button  mode="contained"
                     style={styles.btn}
                     style={{ backgroundColor: "red" }}
@@ -111,28 +208,15 @@ console.log(reserved)
                     </View>
                     :
                     false
-                ))}
-                </View>
-                <View>
-                  <Text>Place That You Reserve : </Text>
-                  {reserved.map(i => (
-                    i.name == info ?
-                    <View key={i.id}>
-                      <Button mode="contained" style={{ backgroundColor: "#FF0000" }} style={styles.btn}>
-                      {i.PlaceId}
-                      </Button>
-                    </View>
-                    :
-                    false
-                  ))}
+                  ))
+                  }
                 </View>
                 <Button
                 onPress={() =>
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'StartScreen' }],
-                })
-                }
+                })}
                 >
                 Logout
                 </Button>

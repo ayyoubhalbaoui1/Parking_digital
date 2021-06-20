@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function LoginScreenClient ({ navigation }) {
 
     // init ip address : 
-    const ip = "http://192.168.11.151:8080";
+    const ip = "http://192.168.1.178:8080";
     const [fullname, setName] = useState("")
     const [password, setPassword] = useState("")
     let history = useHistory()

@@ -1,0 +1,22 @@
+POST http://localhost:8080/api/admins/addAdmin
+Content-Type : application/json
+
+{
+    "email" : "ayoub@gmail.com",
+    "password" : "12345678"
+}
+
+###
+GET http://localhost:8080/api/admins/all
+
+###
+
+PATCH http://localhost:8080/api/place/edit/1
+Content-Type: application/json
+
+{
+    "stat" : true
+}
+
+###
+DELETE http://localhost:8080/api/vih/delete/15

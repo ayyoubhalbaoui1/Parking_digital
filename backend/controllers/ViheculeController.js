@@ -19,6 +19,21 @@ res.status(201).json(data)
     }
 }
 
+// delete vih : 
+const deleteVih = async (req, res) => {
+    const idVih = req.params.id
+    try {
+        await db.Vihecule.destroy({
+            where : {
+                id : idVih
+            }
+        })
+        res.json({message : "Vihecule Deleted Successfuly"})
+    } catch (error) {
+        res.json(error)
+    }
+}
+
 // get all vihecules
 const all = async (req, res) => {
     try {
@@ -33,14 +48,14 @@ const all = async (req, res) => {
 const calc = async (req, res) => {
 
     const placeId = req.params.id
-    console.log(placeId);
+    //console.log(placeId);
     db.Vihecule.findOne({where:{PlaceId: placeId}})
     .then(async findVihucule=>{
         let price=0 ;
         if(findVihucule){
 
             if(findVihucule.dataValues.type === 'bike') {
-                price = 2
+                price = 3
             }else{
                 price = 5
             }
@@ -57,5 +72,6 @@ const calc = async (req, res) => {
 module.exports = {
     addVih,
     calc,
-    all
+    all,
+    deleteVih
 }

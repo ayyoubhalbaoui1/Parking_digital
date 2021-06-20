@@ -12,7 +12,7 @@ import { FlatGrid } from 'react-native-super-grid';
 export default function Dashboard({ navigation }) {
 
     // init ip address : 
-    const ip = "http://192.168.11.151:8080";
+    const ip = "http://192.168.1.178:8080";
     const [data, setData] = useState([])
 
     const placesData = () => {
